@@ -4,14 +4,21 @@ minimal character-level Vanilla RNN model. Written by Andrej Karpathy (@karpathy
 BSD License
 """
 import numpy as np
+import string
+import re
 
 # data I/O
 data = open(r'C:/Users/Daddy/Documents/Code/AI Assistant/textgenrnn_test/shakespear.txt').read() # should be simple plain text file
-words = data.split()
-data_size, vocab_size = len(words), len(set(words))
+words = re.split(r'\W+', data)
+words = [word.lower() for word in words]
+table = str.maketrans('', '', string.punctuation)
+stripped = [word.translate(table) for word in words]
+#print(len(set(words)))
+wordlist = list(set(words))
+data_size, vocab_size = len(words), len(wordlist)
 print('data has %d words, %d unique.' % (data_size, vocab_size))
-word_to_ix = { word:i for i,word in enumerate(words) }
-ix_to_word = { i:word for i,word in enumerate(words) }
+word_to_ix = { word:i for i,word in enumerate(wordlist) }
+ix_to_word = { i:word for i,word in enumerate(wordlist) }
 
 # hyperparameters
 hidden_size = 100 # size of hidden layer of neurons
@@ -66,7 +73,7 @@ def sample(h, seed_ix, n):
   sample a sequence of integers from the model 
   h is memory state, seed_ix is seed word for first time step
   """
-  print(h, seed_ix, n)
+  #print(vocab_size, seed_ix, n)
   x = np.zeros((vocab_size, 1))
   x[seed_ix] = 1
   ixes = []
@@ -89,13 +96,15 @@ while True:
   if p+seq_length+1 >= len(data) or n == 0: 
     hprev = np.zeros((hidden_size,1)) # reset RNN memory
     p = 0 # go from start of data
-  inputs = [word_to_ix[word] for word in words[p:p+seq_length]]         #SOMETHING IS OFF HERE
-  targets = [word_to_ix[word] for word in words[p+1:p+seq_length+1]]    #SOMETHING IS OFF HERE
+  inputs = [word_to_ix[word] for word in wordlist[p:p+seq_length]]         
+  targets = [word_to_ix[word] for word in wordlist[p+1:p+seq_length+1]]    
+  
+  #print(len(word_to_ix),seq_length)
 
   # sample from the model now and then
   if n % 100 == 0:
     sample_ix = sample(hprev, inputs[0], 200)
-    txt = ''.join(ix_to_word[ix] for ix in sample_ix)
+    txt = ' '.join(ix_to_word[ix] for ix in sample_ix)
     print('----\n %s \n----' % (txt, ))
 
   # forward seq_length characters through the net and fetch gradient
