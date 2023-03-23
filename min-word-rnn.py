@@ -3,12 +3,30 @@ A minimal word-level vanilla RNN model.  Modified by Andy J. Wagers from the
 minimal character-level Vanilla RNN model. Written by Andrej Karpathy (@karpathy)
 BSD License
 """
+import sys
 import numpy as np
 import string
 import re
+import warnings
+
+'''
+When the script is called, call also the training data file.
+To call the script:
+
+    $ python3 min-word-rnn.py <text file>
+
+If no file is called, an error message will be sent.
+'''
+# identify the training data file
+if len(sys.argv) > 1:
+    filename = sys.argv[1]
+else:
+    warnings.warn("No training data file identified in calling the script, try again.")
+    exit()
+
 
 # data I/O
-data = open(r'C:/Users/Daddy/Documents/Code/AI Assistant/textgenrnn_test/shakespear.txt').read() # should be simple plain text file
+data = open(filename).read() # should be simple plain text file
 words = re.split(r'\W+', data)
 words = [word.lower() for word in words]
 table = str.maketrans('', '', string.punctuation)
