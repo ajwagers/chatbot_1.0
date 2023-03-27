@@ -24,13 +24,30 @@ else:
     warnings.warn("No training data file identified in calling the script, try again.")
     exit()
 
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r"i'm"," i am",text)
+    text = re.sub(r"he's"," he is",text)
+    text = re.sub(r"she's"," she is",text)
+    text = re.sub(r"that's"," that is",text)
+    text = re.sub(r"what's"," what is",text)
+    text = re.sub(r"where's"," where is",text)
+    text = re.sub(r"\'ll"," will",text)
+    text = re.sub(r"\'ve"," have",text)
+    text = re.sub(r"\'re"," are",text)
+    text = re.sub(r"\'d"," would",text)
+    text = re.sub(r"won't"," will not",text)
+    text = re.sub(r"can't"," can not",text)
+    text = re.sub(r"[=()\/@;:<>~|+-.?,]","",text)
+    return text
 
 # data I/O
 data = open(filename).read() # should be simple plain text file
+data = clean_text(data)
 words = re.split(r'\W+', data)
 words = [word.lower() for word in words]
-table = str.maketrans('', '', string.punctuation)
-stripped = [word.translate(table) for word in words]
+#table = str.maketrans('', '', string.punctuation)
+#stripped = [word.translate(table) for word in words]
 #print(len(set(words)))
 wordlist = list(set(words))
 data_size, vocab_size = len(words), len(wordlist)
@@ -109,15 +126,15 @@ n, p = 0, 0
 mWxh, mWhh, mWhy = np.zeros_like(Wxh), np.zeros_like(Whh), np.zeros_like(Why)
 mbh, mby = np.zeros_like(bh), np.zeros_like(by) # memory variables for Adagrad
 smooth_loss = -np.log(1.0/vocab_size)*seq_length # loss at iteration 0
-while (smooth_loss > 40.0):
+while smooth_loss >= 40:
   # prepare inputs (we're sweeping from left to right in steps seq_length long)
-  if p+seq_length+1 >= len(data) or n == 0: 
+  if p+seq_length+1 >= len(words) or n == 0: 
     hprev = np.zeros((hidden_size,1)) # reset RNN memory
     p = 0 # go from start of data
-  inputs = [word_to_ix[word] for word in wordlist[p:p+seq_length]]         
-  targets = [word_to_ix[word] for word in wordlist[p+1:p+seq_length+1]]    
+  inputs = [word_to_ix[word] for word in words[p:p+seq_length]]         
+  targets = [word_to_ix[word] for word in words[p+1:p+seq_length+1]]    
   
-  #print(len(word_to_ix),seq_length)
+  #print(len(word_to_ix),len(wordlist),p,seq_length)
 
   # sample from the model now and then
   if n % 100 == 0:
