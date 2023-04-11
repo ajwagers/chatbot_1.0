@@ -4,6 +4,7 @@ A simple chatbot based off a Minimalist Recurrent Neural Network algorithm.  The
 The codes is based on:
 https://gist.github.com/karpathy/d4dee566867f8291f086#file-min-char-rnn-py,<br>
 https://github.com/eliben/deep-learning-samples/blob/master/min-char-rnn/min-char-rnn.py, <br>
+https://github.com/sherjilozair/char-rnn-tensorflow <br>
 <br>
 See these articles as well <br>
 https://machinelearningmastery.com/clean-text-machine-learning-python/ <br>
